@@ -1,9 +1,9 @@
+import FileUpload from "@/components/FileUpload"
+
 export default function Home() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white p-8">
-      <h1 className="text-3xl sm:text-5xl font-bold">
-        We will meet soon
-      </h1>
-    </div>
-  );
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <FileUpload maxSize={5} allowedTypes={[".csv", ".pdf"]} />
+    </main>
+  )
 }

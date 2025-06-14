@@ -323,7 +323,8 @@ export default function Home() {
             <section id="concepts" className="mb-16">
                 <h2 className="text-4xl font-bold mb-8">Core Concepts</h2>
                 <p className="text-lg max-w-3xl mb-8">
-                    Kafka's power comes from a few simple but powerful ideas. Click on each card below to learn about the key components that make up the Kafka ecosystem. Understanding these concepts is the first step to mastering Kafka.
+                    {/* FIXED HERE */}
+                    Kafka&apos;s power comes from a few simple but powerful ideas. Click on each card below to learn about the key components that make up the Kafka ecosystem. Understanding these concepts is the first step to mastering Kafka.
                 </p>
                 <div id="concepts-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Concept cards will be injected here by JS */}
@@ -363,7 +364,8 @@ export default function Home() {
             <section id="features-use-cases" className="mb-16">
                  <h2 className="text-4xl font-bold mb-8">Features & Use Cases</h2>
                  <p className="text-lg max-w-3xl mb-8">
-                     Kafka's unique architecture provides a powerful set of features, making it suitable for a wide variety of applications. Use the tabs below to explore its key characteristics and see how companies are using it to build modern data systems.
+                    {/* FIXED HERE */}
+                     Kafka&apos;s unique architecture provides a powerful set of features, making it suitable for a wide variety of applications. Use the tabs below to explore its key characteristics and see how companies are using it to build modern data systems.
                  </p>
                  <div className="flex mb-6 border-b border-gray-300">
                      <button data-tab-target="#features" className="tab-btn features-use-cases-tab active py-2 px-6 font-semibold text-lg border-b-2">Features</button>

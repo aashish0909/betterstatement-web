@@ -433,8 +433,21 @@ function handleListClick(e) {
     const todoItem = e.target.closest('.todo-item');
     const counterWidget = e.target.closest('.counter-widget');
 
+    // Force focus on text inputs with multiple methods for PWA compatibility
     if (e.target.matches('.todo-text, .counter-label')) {
-        e.target.focus();
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Multiple attempts to focus for PWA/touch devices
+        setTimeout(() => {
+            e.target.focus();
+            e.target.click();
+        }, 0);
+        
+        setTimeout(() => {
+            e.target.focus();
+        }, 100);
+        
         return;
     }
 
@@ -445,10 +458,20 @@ function handleListClick(e) {
     }
 }
 
+// Dedicated touch handler for focusing inputs (PWA compatibility)
+function handleTouchFocus(e) {
+    if (e.target.matches('.todo-text, .counter-label')) {
+        e.target.focus();
+    }
+}
+
 todosListEl.addEventListener('click', handleListClick);
 todosListEl.addEventListener('input', handleTodoInput);
+todosListEl.addEventListener('touchstart', handleTouchFocus, { passive: true });
+
 countersListEl.addEventListener('click', handleListClick);
 countersListEl.addEventListener('input', handleCounterInput);
+countersListEl.addEventListener('touchstart', handleTouchFocus, { passive: true });
 
 // Unified Swipe Event Listeners
 document.addEventListener('mousedown', handleSwipeStart);

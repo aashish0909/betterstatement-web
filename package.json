@@ -4,7 +4,7 @@
   "description": "A simple countdown timer to January 1, 2026.",
   "main": "index.html",
   "scripts": {
-    "start": "python3 -m http.server 8000"
+    "vercel-build": "echo 'No build required'"
   },
   "keywords": [
     "countdown",

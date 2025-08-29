@@ -163,6 +163,11 @@ let currentTranslate = 0;
 let swipeType = null; // Can be 'todo' or 'counter'
 
 function handleSwipeStart(e) {
+    // Ignore swipe if the user is interacting with an input or button
+    if (e.target.matches('input, button, .reset-btn, .remove-btn, .todo-checkbox')) {
+        return;
+    }
+
     draggedItem = e.target.closest('.todo-item, .counter-widget');
     if (!draggedItem) return;
 

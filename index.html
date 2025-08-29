@@ -3,13 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown to New Year 2026</title>
+    <title>Countdown to 2026</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="top-center-controls">
+        <div class="date-input-group">
+            <button id="reset-target-date-btn" class="tile">Reset</button>
+            <input type="datetime-local" id="target-date-input">
+            <button id="set-target-date-btn" class="tile">Set</button>
+        </div>
+    </div>
+
+    <div class="todo-list-container">
+        <div id="todos-list">
+            <!-- To-do items will be dynamically inserted here -->
+            <div class="todo-item tile" data-id="1">
+                <input type="checkbox" class="todo-checkbox">
+                <input type="text" class="todo-text" placeholder="New to-do...">
+            </div>
+        </div>
+        <button id="add-todo-btn" class="tile">+</button>
+    </div>
+
+    <div class="custom-counter-container">
+        <div id="counters-list">
+            <!-- Counters will be dynamically inserted here -->
+            <div class="counter-widget tile" data-id="1">
+                <span class="remove-btn">&times;</span>
+                <span class="reset-btn">⟳</span>
+                <p class="custom-counter">0</p>
+                <input type="text" class="counter-label" placeholder="What are you counting?">
+            </div>
+        </div>
+        <button id="add-counter-btn" class="tile">+</button>
+    </div>
+
+    <div id="help-button">?</div>
+
+    <div id="help-modal-overlay" class="hidden"></div>
+    <div id="help-modal" class="tile hidden">
+        <span id="close-modal-btn">&times;</span>
+        <h2>How to Use</h2>
+        <ul>
+            <li><strong>Main Countdown:</strong> Set any future date and time at the top of the screen to start the countdown.</li>
+            <li><strong>To-Do List (Left):</strong>
+                <ul>
+                    <li>Click '+' to add a new to-do.</li>
+                    <li>Click the circle to mark a to-do as complete.</li>
+                    <li>Swipe left to delete a to-do.</li>
+                </ul>
+            </li>
+            <li><strong>Custom Counters (Right):</strong>
+                <ul>
+                    <li>Click a counter to increment its value by 1.</li>
+                    <li>Swipe left to decrement a counter by 1.</li>
+                    <li>Click the '⟳' icon to reset a counter.</li>
+                    <li>Click the '×' icon to remove a counter.</li>
+                    <li>Click '+' to add a new counter.</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
     <div class="container">
-        <h1>Until New Year 2026</h1>
+        <h1 id="countdown-title">Until Jan 1, 2026</h1>
         <div class="countdown">
+            <div>
+                <p id="months">00</p>
+                <span>Months</span>
+            </div>
             <div>
                 <p id="days">00</p>
                 <span>Days</span>
@@ -19,11 +82,21 @@
                 <span>Hours</span>
             </div>
             <div>
-                <p id="minutes">00</p>
-                <span>Minutes</span>
-            </div>
-            <div>
                 <p id="seconds">00</p>
+                <span>Seconds</span>
+            </div>
+        </div>
+        <div class="total-breakdown">
+            <div class="tile">
+                <p id="total-days">0</p>
+                <span>Days</span>
+            </div>
+            <div class="tile">
+                <p id="total-hours">0</p>
+                <span>Hours</span>
+            </div>
+            <div class="tile">
+                <p id="total-seconds">0</p>
                 <span>Seconds</span>
             </div>
         </div>

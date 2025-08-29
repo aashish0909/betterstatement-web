@@ -1,516 +1,521 @@
-const monthsEl = document.getElementById('months');
-const daysEl = document.getElementById('days');
-const hoursEl = document.getElementById('hours');
-const secondsEl = document.getElementById('seconds');
-const totalDaysEl = document.getElementById('total-days');
-const totalHoursEl = document.getElementById('total-hours');
-const totalSecondsEl = document.getElementById('total-seconds');
-const countdownTitleEl = document.getElementById('countdown-title');
-const targetDateInputEl = document.getElementById('target-date-input');
-const setTargetDateBtn = document.getElementById('set-target-date-btn');
-const resetTargetDateBtn = document.getElementById('reset-target-date-btn');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-let targetDate;
-
-function updateTargetDate(dateString) {
-    if (!dateString) return;
-    
-    targetDate = new Date(dateString);
-    localStorage.setItem('targetCountdownDate', dateString);
-
-    // Update UI
-    targetDateInputEl.value = dateString;
-    countdownTitleEl.textContent = `Until ${targetDate.toLocaleDateString('en-us', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric' })}`;
-    countdown(); // update countdown immediately
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
-function loadTargetDate() {
-    const storedDate = localStorage.getItem('targetCountdownDate');
-    const defaultDate = '2026-01-01T00:00';
-    updateTargetDate(storedDate || defaultDate);
+body {
+    background: #080808;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    user-select: none;
 }
 
-function countdown() {
-    if (!targetDate) return;
+.top-center-controls {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
 
-    const now = new Date();
-    const remainingTime = targetDate - now;
+#countdown-title {
+    font-size: 45px;
+    font-weight: 500;
+    margin-bottom: 40px;
+}
 
-    if (remainingTime < 0) {
-        monthsEl.innerHTML = '00';
-        daysEl.innerHTML = '00';
-        hoursEl.innerHTML = '00';
-        secondsEl.innerHTML = '00';
-        totalDaysEl.innerHTML = '0';
-        totalHoursEl.innerHTML = '0';
-        totalSecondsEl.innerHTML = '0';
-        return;
+.date-input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#target-date-input {
+    background: #181818;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    color-scheme: dark;
+}
+
+#set-target-date-btn {
+    background: #252525;
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+#set-target-date-btn:hover {
+    background: #3a3a3a;
+}
+
+#reset-target-date-btn {
+    background: #4a2a2a;
+    border: none;
+    color: #ffc4c4;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+#reset-target-date-btn:hover {
+    background: #6b3e3e;
+}
+
+.counter-widget-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.decrement-background {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100px;
+    background-color: #5c85ff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 30px;
+}
+
+.todo-list-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#todos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.todo-item-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.delete-background {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100px;
+    background-color: #ff5c5c;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 525px; /* Increased width by 50% */
+    min-width: 300px; /* Ensure width is not overridden */
+    padding: 10px 15px;
+    position: relative;
+    transition: transform 0.3s ease;
+    z-index: 2; /* Keep on top of delete background */
+    background-color: #181818; /* Needed to hide delete background */
+}
+
+.todo-item.completed {
+    background-color: #00f2ea;
+    box-shadow: 0 0 20px rgba(0, 242, 234, 0.5);
+}
+
+.todo-checkbox {
+    appearance: none;
+    -webkit-appearance: none; /* Vendor prefix for cross-browser compatibility */
+    width: 22px;
+    height: 22px;
+    border: 2px solid #555;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s, border-color 0.2s;
+    flex-shrink: 0; /* Prevents shrinking inside the flex container */
+    margin: 0;
+    padding: 0;
+}
+
+.todo-checkbox:checked {
+    background-color: #00f2ea;
+    border-color: #00f2ea;
+}
+
+.todo-checkbox:checked::after {
+    content: '✔';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #181818;
+    font-size: 16px;
+}
+
+.todo-text {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    outline: none;
+    flex-grow: 1;
+}
+
+#add-todo-btn {
+    background: #252525;
+    border: none;
+    color: #fff;
+    font-size: 30px;
+    cursor: pointer;
+    width: 100%;
+    padding: 5px;
+    transition: background-color 0.2s;
+}
+
+#add-todo-btn:hover {
+    background: #3a3a3a;
+}
+
+/* Help Button & Modal */
+#help-button {
+    position: fixed; /* Changed for better viewport centering */
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    background-color: #252525;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+
+#help-button:hover {
+    transform: translateX(-50%) scale(1.1);
+}
+
+.hidden {
+    display: none !important;
+}
+
+#help-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+}
+
+#help-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    width: 90%;
+    max-width: 600px;
+    padding: 30px;
+    text-align: left;
+}
+
+#close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+#close-modal-btn:hover {
+    color: #fff;
+}
+
+#help-modal h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#help-modal ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#help-modal li {
+    margin-bottom: 15px;
+}
+
+#help-modal ul ul {
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+#help-modal strong {
+    color: #00f2ea;
+}
+
+/* Orientation Modal */
+#orientation-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+}
+
+#orientation-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2001;
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    text-align: center;
+}
+
+#orientation-modal h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    font-size: 45px;
+    font-weight: 500;
+    margin-bottom: 40px;
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.countdown div {
+    background: #181818;
+    padding: 20px;
+    border-radius: 10px;
+    width: 120px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+.countdown p {
+    font-size: 50px;
+    font-weight: 600;
+}
+
+.countdown span {
+    font-size: 16px;
+    font-weight: 400;
+    display: block;
+    margin-top: 10px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.total-breakdown {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 50px;
+}
+
+.tile {
+    background: #252525;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    text-align: center;
+    width: 180px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.tile:hover {
+    transform: scale(1.05);
+}
+
+.tile p {
+    font-size: 28px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.tile span {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 5px;
+    display: block;
+}
+
+.custom-counter-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+#counters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.counter-label {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-top: 1px solid #444;
+    border-radius: 0;
+    padding: 8px 10px;
+    margin-top: 5px;
+    width: 100%;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    outline: none;
+}
+
+.counter-widget {
+    cursor: pointer;
+    width: 160px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none; /* Prevents text selection */
+    position: relative; /* For positioning the reset button */
+    transition: transform 0.3s ease;
+    z-index: 2;
+    background-color: #252525;
+}
+
+.counter-widget.flash-animation {
+    animation: flash 0.3s ease-in-out;
+}
+
+.counter-widget p {
+    font-size: 32px;
+    margin: 0;
+}
+
+#reset-counter, .reset-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 25px;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+    line-height: 1; /* Adjust line height for large font */
+    margin: 0; /* Reset margin */
+}
+
+#reset-counter:hover, .reset-btn:hover {
+    transform: rotate(180deg);
+    color: #fff;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    font-size: 30px;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.remove-btn:hover {
+    color: #ff5c5c;
+}
+
+#add-counter-btn {
+    background: #252525;
+    border: none;
+    color: #fff;
+    font-size: 30px;
+    cursor: pointer;
+    width: 100%;
+    padding: 5px;
+    transition: background-color 0.2s;
+}
+
+#add-counter-btn:hover {
+    background: #3a3a3a;
+}
+
+@keyframes flash {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        background-color: #252525;
     }
-
-    let years = targetDate.getFullYear() - now.getFullYear();
-    let months = targetDate.getMonth() - now.getMonth();
-    let days = targetDate.getDate() - now.getDate();
-    let hours = targetDate.getHours() - now.getHours();
-    let minutes = targetDate.getMinutes() - now.getMinutes();
-    let seconds = targetDate.getSeconds() - now.getSeconds();
-
-    if (seconds < 0) {
-        minutes--;
-        seconds += 60;
+    50% {
+        transform: scale(1.08);
+        box-shadow: 0 0 40px rgba(0, 242, 234, 0.7);
+        background-color: #00f2ea;
     }
-
-    if (minutes < 0) {
-        hours--;
-        minutes += 60;
-    }
-
-    if (hours < 0) {
-        days--;
-        hours += 24;
-    }
-
-    if (days < 0) {
-        months--;
-        const daysInLastMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        days += daysInLastMonth;
-    }
-
-    if (months < 0) {
-        years--;
-        months += 12;
-    }
-
-    const totalMonths = years * 12 + months;
-
-    const totalDays = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
-    const totalHours = Math.floor(remainingTime / (1000 * 60 * 60));
-    const totalSeconds = Math.floor(remainingTime / 1000);
-
-    totalDaysEl.innerHTML = totalDays.toLocaleString();
-    totalHoursEl.innerHTML = totalHours.toLocaleString();
-    totalSecondsEl.innerHTML = totalSeconds.toLocaleString();
-
-    monthsEl.innerHTML = formatTime(totalMonths);
-    daysEl.innerHTML = formatTime(days);
-    hoursEl.innerHTML = formatTime(hours);
-    secondsEl.innerHTML = formatTime(seconds);
-}
-
-function formatTime(time) {
-    return time < 10 ? `0${time}` : time;
-}
-
-setTargetDateBtn.addEventListener('click', () => {
-    const newDateString = targetDateInputEl.value;
-    if(newDateString){
-        updateTargetDate(newDateString);
-    }
-});
-
-resetTargetDateBtn.addEventListener('click', () => {
-    if (confirm('Are you sure you want to reset the date to the default?')) {
-        const defaultDate = '2026-01-01T00:00';
-        updateTargetDate(defaultDate);
-    }
-});
-
-// Initial call
-loadTargetDate();
-countdown();
-setInterval(countdown, 1000);
-
-// To-Do List
-const todosListEl = document.getElementById('todos-list');
-const addTodoBtn = document.getElementById('add-todo-btn');
-let todos = [];
-
-function renderTodos() {
-    todosListEl.innerHTML = '';
-    todos.forEach(todo => {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('todo-item-wrapper');
-        wrapper.setAttribute('data-id', todo.id);
-
-        wrapper.innerHTML = `
-            <div class="delete-background">Delete</div>
-            <div class="todo-item tile ${todo.completed ? 'completed' : ''}">
-                <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''}>
-                <input type="text" class="todo-text" value="${todo.text}" placeholder="New to-do...">
-            </div>
-        `;
-        todosListEl.appendChild(wrapper);
-    });
-}
-
-function saveTodos() {
-    localStorage.setItem('todos', JSON.stringify(todos));
-}
-
-function loadTodos() {
-    const storedTodos = localStorage.getItem('todos');
-    if (storedTodos) {
-        todos = JSON.parse(storedTodos);
-    } else {
-        todos = [{ id: Date.now(), text: '', completed: false }];
-    }
-    renderTodos();
-}
-
-let draggedItem = null;
-let isDragging = false;
-let startX = 0;
-let currentTranslate = 0;
-let swipeType = null; // Can be 'todo' or 'counter'
-
-function handleSwipeStart(e) {
-    draggedItem = e.target.closest('.todo-item, .counter-widget');
-    if (!draggedItem) return;
-
-    if (draggedItem.classList.contains('todo-item')) {
-        swipeType = 'todo';
-    } else if (draggedItem.classList.contains('counter-widget')) {
-        swipeType = 'counter';
-    }
-
-    startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-    isDragging = true;
-    draggedItem.style.transition = 'none'; // Disable transition for smooth dragging
-}
-
-function handleSwipeMove(e) {
-    if (!isDragging || !draggedItem) return;
-
-    const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-    const diffX = currentX - startX;
-    
-    if (swipeType === 'todo') {
-        // Only allow left swipe for delete
-        currentTranslate = Math.min(0, diffX);
-    } else if (swipeType === 'counter') {
-        // Only allow left swipe for decrement
-        currentTranslate = Math.min(0, diffX);
-    }
-    
-    draggedItem.style.transform = `translateX(${currentTranslate}px)`;
-}
-
-function handleSwipeEnd() {
-    if (!isDragging || !draggedItem) return;
-
-    isDragging = false;
-    draggedItem.style.transition = 'transform 0.3s ease';
-
-    const deleteThreshold = -100;
-
-    if (swipeType === 'todo' && currentTranslate < deleteThreshold) {
-        const todoWrapper = draggedItem.closest('.todo-item-wrapper');
-        const todoId = Number(todoWrapper.getAttribute('data-id'));
-        const todo = todos.find(t => t.id === todoId);
-
-        if (todo && (todo.text !== '' || todo.completed)) {
-            if (confirm('Are you sure you want to delete this to-do item?')) {
-                todos = todos.filter(t => t.id !== todoId);
-            } else {
-                draggedItem.style.transform = `translateX(0px)`;
-                resetSwipeState();
-                return;
-            }
-        } else {
-            todos = todos.filter(t => t.id !== todoId);
-        }
-        
-        if (todos.length === 0) {
-            todos.push({ id: Date.now(), text: '', completed: false });
-        }
-        saveTodos();
-        renderTodos();
-
-    } else if (swipeType === 'counter' && currentTranslate < deleteThreshold) {
-        const counterWrapper = draggedItem.closest('.counter-widget-wrapper');
-        const counterId = Number(counterWrapper.getAttribute('data-id'));
-        const counter = counters.find(c => c.id === counterId);
-
-        if (counter) {
-            counter.count--;
-            draggedItem.querySelector('.custom-counter').textContent = counter.count;
-            saveCounters();
-        }
-        draggedItem.style.transform = `translateX(0px)`;
-
-    } else {
-        // Snap back
-        draggedItem.style.transform = `translateX(0px)`;
-    }
-
-    resetSwipeState();
-}
-
-function resetSwipeState() {
-    draggedItem = null;
-    isDragging = false;
-    startX = 0;
-    currentTranslate = 0;
-    swipeType = null;
-}
-
-function handleTodoClick(e) {
-    if (isDragging) return; // Prevent click during swipe
-    const target = e.target;
-    const todoEl = target.closest('.todo-item');
-    if (!todoEl) return;
-
-    const todoId = Number(todoEl.closest('.todo-item-wrapper').getAttribute('data-id'));
-    const todo = todos.find(t => t.id === todoId);
-    if (!todo) return;
-    
-    // Handle Remove Button for Counters - This logic seems misplaced, it should be in handleCounterClick
-    // The following part is about todo, not counter.
-    // I will assume the remove button for counter is handled in handleCounterClick.
-
-    // Handle Checkbox
-    if (target.classList.contains('todo-checkbox')) {
-        todo.completed = target.checked;
-        todoEl.classList.toggle('completed', todo.completed);
-        
-        if (todo.completed) {
-            todoEl.classList.add('flash-animation');
-            setTimeout(() => {
-                todoEl.classList.remove('flash-animation');
-            }, 300);
-        }
-        saveTodos();
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        background-color: #252525;
     }
 }
-
-function handleTodoInput(e) {
-    const target = e.target;
-    if (!target.classList.contains('todo-text')) return;
-    
-    const todoEl = target.closest('.todo-item');
-    if (!todoEl) return;
-
-    const todoId = Number(todoEl.closest('.todo-item-wrapper').getAttribute('data-id'));
-    const todo = todos.find(t => t.id === todoId);
-    if (!todo) return;
-    
-    todo.text = target.value;
-    saveTodos();
-}
-
-addTodoBtn.addEventListener('click', () => {
-    todos.push({ id: Date.now(), text: '', completed: false });
-    saveTodos();
-    renderTodos();
-    // Focus the new input field for a better user experience
-    todosListEl.querySelector('.todo-item-wrapper:last-child .todo-text').focus();
-});
-
-todosListEl.addEventListener('click', handleTodoClick);
-todosListEl.addEventListener('input', handleTodoInput);
-
-// Add swipe event listeners
-todosListEl.addEventListener('mousedown', handleSwipeStart);
-document.addEventListener('mousemove', handleSwipeMove);
-document.addEventListener('mouseup', handleSwipeEnd);
-todosListEl.addEventListener('touchstart', handleSwipeStart);
-document.addEventListener('touchmove', handleSwipeMove);
-document.addEventListener('touchend', handleSwipeEnd);
-
-
-// Custom Counters
-const countersListEl = document.getElementById('counters-list');
-const addCounterBtn = document.getElementById('add-counter-btn');
-
-let counters = [];
-
-function renderCounters() {
-    countersListEl.innerHTML = ''; // Clear existing counters
-    counters.forEach(counter => {
-        const wrapper = document.createElement('div');
-        wrapper.classList.add('counter-widget-wrapper');
-        wrapper.setAttribute('data-id', counter.id);
-
-        wrapper.innerHTML = `
-            <div class="decrement-background">-1</div>
-            <div class="counter-widget tile">
-                <span class="remove-btn">&times;</span>
-                <span class="reset-btn">⟳</span>
-                <p class="custom-counter">${counter.count}</p>
-                <input type="text" class="counter-label" value="${counter.label}" placeholder="New Counter">
-            </div>
-        `;
-        countersListEl.appendChild(wrapper);
-    });
-}
-
-function saveCounters() {
-    localStorage.setItem('customCounters', JSON.stringify(counters));
-}
-
-function loadCounters() {
-    const storedCounters = localStorage.getItem('customCounters');
-    if (storedCounters) {
-        counters = JSON.parse(storedCounters);
-    } else {
-        // Default counter if none are stored
-        counters = [{ id: Date.now(), count: 0, label: '' }];
-    }
-    renderCounters();
-}
-
-function handleCounterClick(e) {
-    const target = e.target;
-    const counterEl = target.closest('.counter-widget');
-    if (!counterEl) return;
-
-    const counterId = Number(counterEl.closest('.counter-widget-wrapper').getAttribute('data-id'));
-    const counter = counters.find(c => c.id === counterId);
-    if (!counter) return;
-
-    // Remove
-    if (target.classList.contains('remove-btn')) {
-        // Skip confirmation for empty, zero-count counters
-        if (counter.count === 0 && counter.label === '') {
-            counters = counters.filter(c => c.id !== counterId);
-        } else {
-            if (confirm('Are you sure you want to remove this counter?')) {
-                counters = counters.filter(c => c.id !== counterId);
-            } else {
-                return; // Stop if user cancels
-            }
-        }
-
-        if (counters.length === 0) {
-            counters.push({ id: Date.now(), count: 0, label: '' });
-        }
-        saveCounters();
-        renderCounters();
-        return;
-    }
-    
-    // Reset
-    if (target.classList.contains('reset-btn')) {
-        if (confirm('Are you sure you want to reset this counter?')) {
-            counter.count = 0;
-            counterEl.querySelector('.custom-counter').textContent = counter.count;
-            saveCounters();
-        }
-        return;
-    }
-
-    // Don't increment if clicking the label
-    if (target.classList.contains('counter-label')) {
-        return;
-    }
-
-    // Increment
-    if(currentTranslate === 0) { // Only increment if not swiped
-        counter.count++;
-        counterEl.querySelector('.custom-counter').textContent = counter.count;
-
-        counterEl.classList.add('flash-animation');
-        setTimeout(() => {
-            counterEl.classList.remove('flash-animation');
-        }, 300);
-        
-        saveCounters();
-    }
-}
-
-function handleCounterInput(e) {
-    const target = e.target;
-    if (!target.classList.contains('counter-label')) return;
-    
-    const counterEl = target.closest('.counter-widget');
-    if (!counterEl) return;
-
-    const counterId = Number(counterEl.closest('.counter-widget-wrapper').getAttribute('data-id'));
-    const counter = counters.find(c => c.id === counterId);
-    if (!counter) return;
-    
-    counter.label = target.value;
-    saveCounters();
-}
-
-addCounterBtn.addEventListener('click', () => {
-    counters.push({ id: Date.now(), count: 0, label: '' });
-    saveCounters();
-    renderCounters();
-    // Focus the new input field for a better user experience
-    countersListEl.querySelector('.counter-widget-wrapper:last-child .counter-label').focus();
-});
-
-todosListEl.addEventListener('click', handleTodoClick);
-todosListEl.addEventListener('input', handleTodoInput);
-countersListEl.addEventListener('click', handleCounterClick);
-countersListEl.addEventListener('input', handleCounterInput);
-
-// Unified Swipe Event Listeners
-document.addEventListener('mousedown', handleSwipeStart);
-document.addEventListener('mousemove', handleSwipeMove);
-document.addEventListener('mouseup', handleSwipeEnd);
-document.addEventListener('touchstart', handleSwipeStart, { passive: true });
-document.addEventListener('touchmove', handleSwipeMove, { passive: true });
-document.addEventListener('touchend', handleSwipeEnd);
-
-// Help Modal
-const helpButton = document.getElementById('help-button');
-const helpModal = document.getElementById('help-modal');
-const helpModalOverlay = document.getElementById('help-modal-overlay');
-const closeModalBtn = document.getElementById('close-modal-btn');
-
-const APP_VERSION = '1.2'; // Increment to force-clear storage on update
-
-function initializeStorage() {
-    const storedVersion = localStorage.getItem('appVersion');
-    if (storedVersion !== APP_VERSION) {
-        // Clear old storage keys to apply updates
-        localStorage.removeItem('todos');
-        localStorage.removeItem('customCounters');
-        localStorage.removeItem('targetCountdownDate');
-
-        // Set the new version
-        localStorage.setItem('appVersion', APP_VERSION);
-    }
-}
-
-function showHelpModal() {
-    helpModal.classList.remove('hidden');
-    helpModalOverlay.classList.remove('hidden');
-}
-
-function hideHelpModal() {
-    helpModal.classList.add('hidden');
-    helpModalOverlay.classList.add('hidden');
-}
-
-helpButton.addEventListener('click', showHelpModal);
-closeModalBtn.addEventListener('click', hideHelpModal);
-helpModalOverlay.addEventListener('click', hideHelpModal);
-
-// Orientation Warning for iPad
-const orientationModal = document.getElementById('orientation-modal');
-const orientationModalOverlay = document.getElementById('orientation-modal-overlay');
-
-function isIPad() {
-    return /iPad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-}
-
-function checkOrientation() {
-    if (isIPad() && window.matchMedia("(orientation: portrait)").matches) {
-        orientationModal.classList.remove('hidden');
-        orientationModalOverlay.classList.remove('hidden');
-    } else {
-        orientationModal.classList.add('hidden');
-        orientationModalOverlay.classList.add('hidden');
-    }
-}
-
-window.addEventListener('orientationchange', checkOrientation);
-window.addEventListener('resize', checkOrientation); // For better reliability
-
-initializeStorage();
-loadTargetDate();
-loadCounters();
-loadTodos();
-checkOrientation(); // Initial check

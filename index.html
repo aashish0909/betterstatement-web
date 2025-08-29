@@ -3,8 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown to 2026</title>
+    <title>Focus Utility</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Focus Utility">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+
 </head>
 <body>
     <div class="top-center-controls">
@@ -17,7 +24,6 @@
 
     <div class="todo-list-container">
         <div id="todos-list">
-            <!-- To-do items will be dynamically inserted here -->
             <div class="todo-item tile" data-id="1">
                 <input type="checkbox" class="todo-checkbox">
                 <input type="text" class="todo-text" placeholder="New to-do...">
@@ -28,7 +34,6 @@
 
     <div class="custom-counter-container">
         <div id="counters-list">
-            <!-- Counters will be dynamically inserted here -->
             <div class="counter-widget tile" data-id="1">
                 <span class="remove-btn">&times;</span>
                 <span class="reset-btn">⟳</span>

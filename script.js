@@ -268,9 +268,32 @@ function handleTodoClick(e) {
     const todo = todos.find(t => t.id === todoId);
     if (!todo) return;
     
-    // Handle Remove Button for Counters - This logic seems misplaced, it should be in handleCounterClick
-    // The following part is about todo, not counter.
-    // I will assume the remove button for counter is handled in handleCounterClick.
+    // If clicking the text input, ensure it gets focus.
+    if (target.classList.contains('todo-text')) {
+        target.focus();
+        return;
+    }
+    
+    // Handle Remove Button
+    if (target.classList.contains('remove-btn')) {
+        // Skip confirmation for empty, zero-count counters
+        if (counter.count === 0 && counter.label === '') {
+            counters = counters.filter(c => c.id !== counterId);
+        } else {
+            if (confirm('Are you sure you want to remove this counter?')) {
+                counters = counters.filter(c => c.id !== counterId);
+            } else {
+                return; // Stop if user cancels
+            }
+        }
+
+        if (counters.length === 0) {
+            counters.push({ id: Date.now(), count: 0, label: '' });
+        }
+        saveCounters();
+        renderCounters();
+        return;
+    }
 
     // Handle Checkbox
     if (target.classList.contains('todo-checkbox')) {
@@ -403,8 +426,9 @@ function handleCounterClick(e) {
         return;
     }
 
-    // Don't increment if clicking the label
+    // Don't increment if clicking the label, but do focus it
     if (target.classList.contains('counter-label')) {
+        target.focus();
         return;
     }
 

@@ -319,16 +319,7 @@ addTodoBtn.addEventListener('click', () => {
     todosListEl.querySelector('.todo-item-wrapper:last-child .todo-text').focus();
 });
 
-todosListEl.addEventListener('click', handleListClick);
-todosListEl.addEventListener('input', handleTodoInput);
-
-// Add swipe event listeners
-todosListEl.addEventListener('mousedown', handleSwipeStart);
-document.addEventListener('mousemove', handleSwipeMove);
-document.addEventListener('mouseup', handleSwipeEnd);
-todosListEl.addEventListener('touchstart', handleSwipeStart);
-document.addEventListener('touchmove', handleSwipeMove);
-document.addEventListener('touchend', handleSwipeEnd);
+// Event listeners are now handled by the unified system below
 
 
 // Custom Counters
@@ -437,10 +428,20 @@ addCounterBtn.addEventListener('click', () => {
     countersListEl.querySelector('.counter-widget-wrapper:last-child .counter-label').focus();
 });
 
-// This new handler specifically deals with focusing inputs on touch devices
-function handleInputFocus(e) {
+// A unified handler for all clicks on the lists
+function handleListClick(e) {
+    const todoItem = e.target.closest('.todo-item');
+    const counterWidget = e.target.closest('.counter-widget');
+
     if (e.target.matches('.todo-text, .counter-label')) {
         e.target.focus();
+        return;
+    }
+
+    if (todoItem) {
+        handleTodoClick(e, todoItem);
+    } else if (counterWidget) {
+        handleCounterClick(e, counterWidget);
     }
 }
 
@@ -449,10 +450,6 @@ todosListEl.addEventListener('input', handleTodoInput);
 countersListEl.addEventListener('click', handleListClick);
 countersListEl.addEventListener('input', handleCounterInput);
 
-// Listen for touch start on the lists to handle focus directly
-todosListEl.addEventListener('touchstart', handleInputFocus, { passive: true });
-countersListEl.addEventListener('touchstart', handleInputFocus, { passive: true });
-
 // Unified Swipe Event Listeners
 document.addEventListener('mousedown', handleSwipeStart);
 document.addEventListener('mousemove', handleSwipeMove);
@@ -460,7 +457,6 @@ document.addEventListener('mouseup', handleSwipeEnd);
 document.addEventListener('touchstart', handleSwipeStart, { passive: true });
 document.addEventListener('touchmove', handleSwipeMove, { passive: true });
 document.addEventListener('touchend', handleSwipeEnd);
-document.addEventListener('touchend', handleTouchEndForFocus); // Add new listener for touch focus
 
 
 // Help Modal
@@ -469,7 +465,7 @@ const helpModal = document.getElementById('help-modal');
 const helpModalOverlay = document.getElementById('help-modal-overlay');
 const closeModalBtn = document.getElementById('close-modal-btn');
 
-const APP_VERSION = '1.2'; // Increment to force-clear storage on update
+const APP_VERSION = '1.3'; // Increment to force-clear storage on update
 
 function initializeStorage() {
     const storedVersion = localStorage.getItem('appVersion');

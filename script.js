@@ -277,21 +277,13 @@ function resetSwipeState() {
     hasDragged = false;
 }
 
-function handleTodoClick(e) {
-    if (hasDragged) return; // Prevent click after swipe
-
-    const target = e.target;
-    
-    // This handler should ONLY be concerned with the checkbox
-    if (target.classList.contains('todo-checkbox')) {
-        const todoEl = target.closest('.todo-item');
-        if (!todoEl) return;
-        
+function handleTodoClick(e, todoEl) {
+    if (e.target.classList.contains('todo-checkbox')) {
         const todoId = Number(todoEl.closest('.todo-item-wrapper').getAttribute('data-id'));
         const todo = todos.find(t => t.id === todoId);
         if (!todo) return;
 
-        todo.completed = target.checked;
+        todo.completed = e.target.checked;
         todoEl.classList.toggle('completed', todo.completed);
         
         if (todo.completed) {
@@ -327,7 +319,7 @@ addTodoBtn.addEventListener('click', () => {
     todosListEl.querySelector('.todo-item-wrapper:last-child .todo-text').focus();
 });
 
-todosListEl.addEventListener('click', handleTodoClick);
+todosListEl.addEventListener('click', handleListClick);
 todosListEl.addEventListener('input', handleTodoInput);
 
 // Add swipe event listeners
@@ -380,30 +372,21 @@ function loadCounters() {
     renderCounters();
 }
 
-function handleCounterClick(e) {
-    if (hasDragged) return; // Prevent click after swipe
-
-    const target = e.target;
-    const counterEl = target.closest('.counter-widget');
-    if (!counterEl) return;
-
+function handleCounterClick(e, counterEl) {
     const counterId = Number(counterEl.closest('.counter-widget-wrapper').getAttribute('data-id'));
     const counter = counters.find(c => c.id === counterId);
     if (!counter) return;
 
-    // Remove
-    if (target.classList.contains('remove-btn')) {
-        // Skip confirmation for empty, zero-count counters
+    if (e.target.classList.contains('remove-btn')) {
         if (counter.count === 0 && counter.label === '') {
             counters = counters.filter(c => c.id !== counterId);
         } else {
             if (confirm('Are you sure you want to remove this counter?')) {
                 counters = counters.filter(c => c.id !== counterId);
             } else {
-                return; // Stop if user cancels
+                return;
             }
         }
-
         if (counters.length === 0) {
             counters.push({ id: Date.now(), count: 0, label: '' });
         }
@@ -412,8 +395,7 @@ function handleCounterClick(e) {
         return;
     }
     
-    // Reset
-    if (target.classList.contains('reset-btn')) {
+    if (e.target.classList.contains('reset-btn')) {
         if (confirm('Are you sure you want to reset this counter?')) {
             counter.count = 0;
             counterEl.querySelector('.custom-counter').textContent = counter.count;
@@ -422,20 +404,13 @@ function handleCounterClick(e) {
         return;
     }
 
-    // Don't increment if clicking the label
-    if (target.classList.contains('counter-label')) {
-        return;
-    }
-
-    // Increment
+    // Increment logic (default action for clicking the tile itself)
     counter.count++;
     counterEl.querySelector('.custom-counter').textContent = counter.count;
-
     counterEl.classList.add('flash-animation');
     setTimeout(() => {
         counterEl.classList.remove('flash-animation');
     }, 300);
-    
     saveCounters();
 }
 
@@ -469,9 +444,9 @@ function handleInputFocus(e) {
     }
 }
 
-todosListEl.addEventListener('click', handleTodoClick);
+todosListEl.addEventListener('click', handleListClick);
 todosListEl.addEventListener('input', handleTodoInput);
-countersListEl.addEventListener('click', handleCounterClick);
+countersListEl.addEventListener('click', handleListClick);
 countersListEl.addEventListener('input', handleCounterInput);
 
 // Listen for touch start on the lists to handle focus directly

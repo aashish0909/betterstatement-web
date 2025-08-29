@@ -1,0 +1,16 @@
+{
+  "name": "countdown-timer",
+  "version": "1.0.0",
+  "description": "A simple countdown timer to January 1, 2026.",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "countdown",
+    "timer",
+    "javascript"
+  ],
+  "author": "",
+  "license": "ISC"
+}

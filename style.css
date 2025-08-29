@@ -300,6 +300,34 @@ body {
     color: #00f2ea;
 }
 
+/* Orientation Modal */
+#orientation-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+}
+
+#orientation-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2001;
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    text-align: center;
+}
+
+#orientation-modal h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
 .container {
     text-align: center;
 }

@@ -464,10 +464,12 @@ const APP_VERSION = '1.2'; // Increment to force-clear storage on update
 function initializeStorage() {
     const storedVersion = localStorage.getItem('appVersion');
     if (storedVersion !== APP_VERSION) {
+        // Clear old storage keys to apply updates
         localStorage.removeItem('todos');
         localStorage.removeItem('customCounters');
         localStorage.removeItem('targetCountdownDate');
 
+        // Set the new version
         localStorage.setItem('appVersion', APP_VERSION);
     }
 }
@@ -486,7 +488,29 @@ helpButton.addEventListener('click', showHelpModal);
 closeModalBtn.addEventListener('click', hideHelpModal);
 helpModalOverlay.addEventListener('click', hideHelpModal);
 
+// Orientation Warning for iPad
+const orientationModal = document.getElementById('orientation-modal');
+const orientationModalOverlay = document.getElementById('orientation-modal-overlay');
+
+function isIPad() {
+    return /iPad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function checkOrientation() {
+    if (isIPad() && window.matchMedia("(orientation: portrait)").matches) {
+        orientationModal.classList.remove('hidden');
+        orientationModalOverlay.classList.remove('hidden');
+    } else {
+        orientationModal.classList.add('hidden');
+        orientationModalOverlay.classList.add('hidden');
+    }
+}
+
+window.addEventListener('orientationchange', checkOrientation);
+window.addEventListener('resize', checkOrientation); // For better reliability
+
 initializeStorage();
 loadTargetDate();
 loadCounters();
 loadTodos();
+checkOrientation(); // Initial check

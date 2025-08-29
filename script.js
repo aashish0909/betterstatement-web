@@ -161,10 +161,15 @@ let isDragging = false;
 let startX = 0;
 let currentTranslate = 0;
 let swipeType = null; // Can be 'todo' or 'counter'
+let hasDragged = false; // Flag to distinguish tap from swipe
 
 function handleSwipeStart(e) {
+    hasDragged = false; // Reset on new touch
+
     // Ignore swipe if the user is interacting with an input or button
     if (e.target.matches('input, button, .reset-btn, .remove-btn, .todo-checkbox')) {
+        isDragging = false;
+        draggedItem = null;
         return;
     }
 
@@ -184,6 +189,7 @@ function handleSwipeStart(e) {
 
 function handleSwipeMove(e) {
     if (!isDragging || !draggedItem) return;
+    hasDragged = true; // It's a swipe, not a tap
 
     const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
     const diffX = currentX - startX;
@@ -199,8 +205,20 @@ function handleSwipeMove(e) {
     draggedItem.style.transform = `translateX(${currentTranslate}px)`;
 }
 
-function handleSwipeEnd() {
-    if (!isDragging || !draggedItem) return;
+function handleSwipeEnd(e) {
+    // If we didn't drag, it's a tap. Handle focusing inputs on touchend.
+    if (!hasDragged) {
+        if (e.target.matches('.todo-text, .counter-label')) {
+            e.target.focus();
+        }
+        resetSwipeState();
+        return;
+    }
+
+    if (!isDragging || !draggedItem) {
+        resetSwipeState();
+        return;
+    }
 
     isDragging = false;
     draggedItem.style.transition = 'transform 0.3s ease';
@@ -256,47 +274,23 @@ function resetSwipeState() {
     startX = 0;
     currentTranslate = 0;
     swipeType = null;
+    hasDragged = false;
 }
 
 function handleTodoClick(e) {
-    if (isDragging) return; // Prevent click during swipe
+    if (hasDragged) return; // Prevent click after swipe
+
     const target = e.target;
-    const todoEl = target.closest('.todo-item');
-    if (!todoEl) return;
-
-    const todoId = Number(todoEl.closest('.todo-item-wrapper').getAttribute('data-id'));
-    const todo = todos.find(t => t.id === todoId);
-    if (!todo) return;
     
-    // If clicking the text input, ensure it gets focus.
-    if (target.classList.contains('todo-text')) {
-        target.focus();
-        return;
-    }
-    
-    // Handle Remove Button
-    if (target.classList.contains('remove-btn')) {
-        // Skip confirmation for empty, zero-count counters
-        if (counter.count === 0 && counter.label === '') {
-            counters = counters.filter(c => c.id !== counterId);
-        } else {
-            if (confirm('Are you sure you want to remove this counter?')) {
-                counters = counters.filter(c => c.id !== counterId);
-            } else {
-                return; // Stop if user cancels
-            }
-        }
-
-        if (counters.length === 0) {
-            counters.push({ id: Date.now(), count: 0, label: '' });
-        }
-        saveCounters();
-        renderCounters();
-        return;
-    }
-
-    // Handle Checkbox
+    // This handler should ONLY be concerned with the checkbox
     if (target.classList.contains('todo-checkbox')) {
+        const todoEl = target.closest('.todo-item');
+        if (!todoEl) return;
+        
+        const todoId = Number(todoEl.closest('.todo-item-wrapper').getAttribute('data-id'));
+        const todo = todos.find(t => t.id === todoId);
+        if (!todo) return;
+
         todo.completed = target.checked;
         todoEl.classList.toggle('completed', todo.completed);
         
@@ -387,6 +381,8 @@ function loadCounters() {
 }
 
 function handleCounterClick(e) {
+    if (hasDragged) return; // Prevent click after swipe
+
     const target = e.target;
     const counterEl = target.closest('.counter-widget');
     if (!counterEl) return;
@@ -426,24 +422,21 @@ function handleCounterClick(e) {
         return;
     }
 
-    // Don't increment if clicking the label, but do focus it
+    // Don't increment if clicking the label
     if (target.classList.contains('counter-label')) {
-        target.focus();
         return;
     }
 
     // Increment
-    if(currentTranslate === 0) { // Only increment if not swiped
-        counter.count++;
-        counterEl.querySelector('.custom-counter').textContent = counter.count;
+    counter.count++;
+    counterEl.querySelector('.custom-counter').textContent = counter.count;
 
-        counterEl.classList.add('flash-animation');
-        setTimeout(() => {
-            counterEl.classList.remove('flash-animation');
-        }, 300);
-        
-        saveCounters();
-    }
+    counterEl.classList.add('flash-animation');
+    setTimeout(() => {
+        counterEl.classList.remove('flash-animation');
+    }, 300);
+    
+    saveCounters();
 }
 
 function handleCounterInput(e) {
@@ -469,6 +462,16 @@ addCounterBtn.addEventListener('click', () => {
     countersListEl.querySelector('.counter-widget-wrapper:last-child .counter-label').focus();
 });
 
+// This new handler specifically deals with focusing inputs on touch devices
+function handleTouchEndForFocus(e) {
+    if (hasDragged) {
+        return; // It was a swipe, so don't focus
+    }
+    if (e.target.matches('.todo-text, .counter-label')) {
+        e.target.focus();
+    }
+}
+
 todosListEl.addEventListener('click', handleTodoClick);
 todosListEl.addEventListener('input', handleTodoInput);
 countersListEl.addEventListener('click', handleCounterClick);
@@ -481,6 +484,8 @@ document.addEventListener('mouseup', handleSwipeEnd);
 document.addEventListener('touchstart', handleSwipeStart, { passive: true });
 document.addEventListener('touchmove', handleSwipeMove, { passive: true });
 document.addEventListener('touchend', handleSwipeEnd);
+document.addEventListener('touchend', handleTouchEndForFocus); // Add new listener for touch focus
+
 
 // Help Modal
 const helpButton = document.getElementById('help-button');

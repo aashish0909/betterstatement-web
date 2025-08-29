@@ -151,7 +151,7 @@ function loadTodos() {
     if (storedTodos) {
         todos = JSON.parse(storedTodos);
     } else {
-        todos = [{ id: Date.now(), text: 'My first to-do', completed: false }];
+        todos = [{ id: Date.now(), text: '', completed: false }];
     }
     renderTodos();
 }
@@ -353,7 +353,7 @@ function loadCounters() {
         counters = JSON.parse(storedCounters);
     } else {
         // Default counter if none are stored
-        counters = [{ id: Date.now(), count: 0, label: 'My First Counter' }];
+        counters = [{ id: Date.now(), count: 0, label: '' }];
     }
     renderCounters();
 }
@@ -459,6 +459,19 @@ const helpModal = document.getElementById('help-modal');
 const helpModalOverlay = document.getElementById('help-modal-overlay');
 const closeModalBtn = document.getElementById('close-modal-btn');
 
+const APP_VERSION = '1.2'; // Increment to force-clear storage on update
+
+function initializeStorage() {
+    const storedVersion = localStorage.getItem('appVersion');
+    if (storedVersion !== APP_VERSION) {
+        localStorage.removeItem('todos');
+        localStorage.removeItem('customCounters');
+        localStorage.removeItem('targetCountdownDate');
+
+        localStorage.setItem('appVersion', APP_VERSION);
+    }
+}
+
 function showHelpModal() {
     helpModal.classList.remove('hidden');
     helpModalOverlay.classList.remove('hidden');
@@ -473,6 +486,7 @@ helpButton.addEventListener('click', showHelpModal);
 closeModalBtn.addEventListener('click', hideHelpModal);
 helpModalOverlay.addEventListener('click', hideHelpModal);
 
-
+initializeStorage();
+loadTargetDate();
 loadCounters();
 loadTodos();

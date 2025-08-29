@@ -463,10 +463,7 @@ addCounterBtn.addEventListener('click', () => {
 });
 
 // This new handler specifically deals with focusing inputs on touch devices
-function handleTouchEndForFocus(e) {
-    if (hasDragged) {
-        return; // It was a swipe, so don't focus
-    }
+function handleInputFocus(e) {
     if (e.target.matches('.todo-text, .counter-label')) {
         e.target.focus();
     }
@@ -476,6 +473,10 @@ todosListEl.addEventListener('click', handleTodoClick);
 todosListEl.addEventListener('input', handleTodoInput);
 countersListEl.addEventListener('click', handleCounterClick);
 countersListEl.addEventListener('input', handleCounterInput);
+
+// Listen for touch start on the lists to handle focus directly
+todosListEl.addEventListener('touchstart', handleInputFocus, { passive: true });
+countersListEl.addEventListener('touchstart', handleInputFocus, { passive: true });
 
 // Unified Swipe Event Listeners
 document.addEventListener('mousedown', handleSwipeStart);

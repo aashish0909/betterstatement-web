@@ -1,9 +1,11 @@
 const monthsEl = document.getElementById('months');
 const daysEl = document.getElementById('days');
 const hoursEl = document.getElementById('hours');
+const minutesEl = document.getElementById('minutes');
 const secondsEl = document.getElementById('seconds');
 const totalDaysEl = document.getElementById('total-days');
 const totalHoursEl = document.getElementById('total-hours');
+const totalMinutesEl = document.getElementById('total-minutes');
 const totalSecondsEl = document.getElementById('total-seconds');
 const countdownTitleEl = document.getElementById('countdown-title');
 const targetDateInputEl = document.getElementById('target-date-input');
@@ -40,9 +42,11 @@ function countdown() {
         monthsEl.innerHTML = '00';
         daysEl.innerHTML = '00';
         hoursEl.innerHTML = '00';
+        minutesEl.innerHTML = '00';
         secondsEl.innerHTML = '00';
         totalDaysEl.innerHTML = '0';
         totalHoursEl.innerHTML = '0';
+        totalMinutesEl.innerHTML = '0';
         totalSecondsEl.innerHTML = '0';
         return;
     }
@@ -84,15 +88,18 @@ function countdown() {
 
     const totalDays = Math.floor(remainingTime / (1000 * 60 * 60 * 24));
     const totalHours = Math.floor(remainingTime / (1000 * 60 * 60));
+    const totalMinutes = Math.floor(remainingTime / (1000 * 60));
     const totalSeconds = Math.floor(remainingTime / 1000);
 
     totalDaysEl.innerHTML = totalDays.toLocaleString();
     totalHoursEl.innerHTML = totalHours.toLocaleString();
+    totalMinutesEl.innerHTML = totalMinutes.toLocaleString();
     totalSecondsEl.innerHTML = totalSeconds.toLocaleString();
 
     monthsEl.innerHTML = formatTime(totalMonths);
     daysEl.innerHTML = formatTime(days);
     hoursEl.innerHTML = formatTime(hours);
+    minutesEl.innerHTML = formatTime(minutes);
     secondsEl.innerHTML = formatTime(seconds);
 }
 
